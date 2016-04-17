@@ -1,0 +1,41 @@
+#
+# Need to run firefox a privileged as it using lxc as well
+#
+# On osx - you need xquartz and socat
+# brew install socat
+# download xquartz from http://www.xquartz.org/
+# After installing xquartz, log out and log back in (This sets $DISPLAY to a pipe)
+# Get the IP address of the vboxnet0 network in xquartz (I opened a terminal and execute ifconfig)
+#
+# Start socat in a shell
+#   ```socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" ```
+# xquartz starts automatically
+#
+# Pass the IP from vboxnet0 to the start of the container
+#   ``` docker run -it --privileged -e DISPLAY=192.168.99.1:0 flowdock```
+
+FROM debian:stable
+# Add the PPA for google
+RUN echo 'deb http://httpredir.debian.org/debian stable main' >> /etc/apt/sources.list
+RUN apt-get update
+#RUN apt-get -y install firefox-esr
+RUN apt-get -y install iceweasel wget zip
+# Get the mkiosk for running in full screen mode
+RUN cd /tmp; wget https://addons.mozilla.org/firefox/downloads/latest/243504/addon-243504-latest.xpi;\
+   unzip addon-243504-latest.xpi; \
+   rm addon-243504-latest.xpi; \
+   cat install.rdf; \
+   ext_id=$(grep -m 1 -e NS1:id install.rdf); \
+   ext_id=${ext_id%\"*}; \
+   ext_id=${ext_id#*\"}; \
+   mkdir -p /usr/lib/iceweasel/browser/extensions/$ext_id; \
+   cp -r * /usr/lib/iceweasel/browser/extensions/$ext_id; \
+   rm -rf *;
+# Create the developer user
+RUN useradd -ms /bin/bash developer
+
+USER developer
+ENV HOME /home/developer
+
+ENTRYPOINT [ "iceweasel" ]
+CMD [ "https://www.flowdock.com" ]
