@@ -20,14 +20,15 @@ RUN echo 'deb http://httpredir.debian.org/debian stable main' >> /etc/apt/source
 RUN apt-get update
 #RUN apt-get -y install firefox-esr
 RUN apt-get -y install iceweasel wget zip
-# Get the mkiosk for running in full screen mode
-RUN cd /tmp; wget https://addons.mozilla.org/firefox/downloads/latest/243504/addon-243504-latest.xpi;\
-   unzip addon-243504-latest.xpi; \
-   rm addon-243504-latest.xpi; \
+# Get the rkiosk for running in full screen mode
+RUN cd /tmp; wget https://addons.mozilla.org/firefox/downloads/file/132044/r_kiosk-0.9.0-fx.xpi;\
+   unzip r_kiosk-0.9.0-fx.xpi; \
+   rm r_kiosk-0.9.0-fx.xpi; \
    cat install.rdf; \
-   ext_id=$(grep -m 1 -e NS1:id install.rdf); \
-   ext_id=${ext_id%\"*}; \
-   ext_id=${ext_id#*\"}; \
+   ext_id=$(grep -m 1 -e em:id install.rdf); \
+   ext_id=${ext_id%<*}; \
+   ext_id=${ext_id#*>}; \
+   echo $ext_id; \
    mkdir -p /usr/lib/iceweasel/browser/extensions/$ext_id; \
    cp -r * /usr/lib/iceweasel/browser/extensions/$ext_id; \
    rm -rf *;

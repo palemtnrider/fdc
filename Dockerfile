@@ -16,7 +16,7 @@
 
 FROM debian:stable
 # Add the PPA for google
-RUN echo 'deb http://httpredir.debian.org/debian testing main' >> /etc/apt/sources.list
+RUN echo 'deb http://httpredir.debian.org/debian stable main' >> /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y install curl
 RUN curl -sSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
